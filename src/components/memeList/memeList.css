@@ -1,0 +1,8 @@
+.loadMore:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+.loading {
+  padding-top: 30px;
+  font-size: 25px;
+}

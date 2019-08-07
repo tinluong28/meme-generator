@@ -1,26 +1,96 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import CreateMeme from "./components/createMeme/createMeme";
+import MyMemes from "./components/myMemes/myMemes";
+import MemeList from "./components/memeList/memeList";
+import { MemeContext } from "./context/meme-context";
+import "./App.css";
+import { username, password } from "./context/secret";
+import { async } from "q";
 
 function App() {
+  const [memes, setMemes] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [memeLimit, setMemeLimit] = useState(10);
+  const [text, setText] = useState({ text0: "", text1: "" });
+  const loadMore = () => setMemeLimit(memeLimit + 10);
+  const [newMemes, setNewMemes] = useState([]);
+  const fetchData = async () => {
+    setIsLoading(true);
+    const result = await fetch("https://api.imgflip.com/get_memes");
+    const json = await result.json();
+    setMemes(json.data.memes);
+    setIsLoading(false);
+  };
+  const set_text = (field, input) => {
+    if (field === "text0") {
+      setText({ ...text, text0: input });
+    } else if (field === "text1") {
+      setText({ ...text, text1: input });
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const postMemeJson = params => {
+    params["username"] = username;
+    params["password"] = password;
+    const bodyParams = Object.keys(params)
+      .map(key => {
+        return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+      })
+      .join("&");
+    console.log("bodyParams", bodyParams);
+    //x-www-form
+    return fetch("https://api.imgflip.com/caption_image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: bodyParams
+    }).then(response => response.json());
+  };
+  const createMeme = new_meme_object => {
+    postMemeJson(new_meme_object).then(new_meme =>
+      setNewMemes([...newMemes, new_meme])
+    );
+  };
+  console.log(newMemes);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <MemeContext.Provider
+        value={{
+          memes: memes,
+          isLoading: isLoading,
+          memeLimit: memeLimit,
+          loadMore: loadMore,
+          text0: text.text0,
+          text1: text.text1,
+          createMeme: createMeme,
+          myMemes: newMemes
+        }}
+      >
+        <h1>Welcome to the Meme Generator!</h1>
+        <CreateMeme set_text={set_text} />
+        <MyMemes />
+        <MemeList />
+      </MemeContext.Provider>
     </div>
   );
 }
+// useEffect(() => {
+//   // let jsonData = fetchMemesJson().then(json => json);
+//   // [memes] = jsonData.data;
+// });
+// // console.log(memes);
+// return (
+//   <MemeProvider>
+//     <div className="App">
+//       <h1 className="text-center mt-3">Welcome to the Meme Generator!</h1>
+//       <CreateMeme />
+//       <MemeList />
+//     </div>
+//   </MemeProvider>
+// );
 
 export default App;
