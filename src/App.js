@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CreateMeme from "./components/createMeme/createMeme";
 import MyMemes from "./components/myMemes/myMemes";
 import MemeList from "./components/memeList/memeList";
-import { MemeContext } from "./context/meme-context";
+import { MemeContext, MemeProvider } from "./context/meme-context";
 import "./App.css";
 import { username, password } from "./context/secret";
 import { async } from "q";
@@ -40,7 +40,7 @@ function App() {
         return encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
       })
       .join("&");
-    console.log("bodyParams", bodyParams);
+
     //x-www-form
     return fetch("https://api.imgflip.com/caption_image", {
       method: "POST",
@@ -55,7 +55,7 @@ function App() {
       setNewMemes([...newMemes, new_meme])
     );
   };
-  console.log(newMemes);
+
   return (
     <div className="App">
       <MemeContext.Provider
@@ -73,24 +73,11 @@ function App() {
         <h1>Welcome to the Meme Generator!</h1>
         <CreateMeme set_text={set_text} />
         <MyMemes />
+        <hr />
         <MemeList />
       </MemeContext.Provider>
     </div>
   );
 }
-// useEffect(() => {
-//   // let jsonData = fetchMemesJson().then(json => json);
-//   // [memes] = jsonData.data;
-// });
-// // console.log(memes);
-// return (
-//   <MemeProvider>
-//     <div className="App">
-//       <h1 className="text-center mt-3">Welcome to the Meme Generator!</h1>
-//       <CreateMeme />
-//       <MemeList />
-//     </div>
-//   </MemeProvider>
-// );
 
 export default App;

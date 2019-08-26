@@ -13,7 +13,15 @@ const MemeItem = props => {
     };
     context.createMeme(memeObj);
   };
-  console.log(context.text0, context.text1);
+
+  const text_on_hover =
+    props.type == "myMemes" ? (
+      <p className={hovered ? "meme-text" : "no-text"}>
+        {"Save it & share with your friends!!"}
+      </p>
+    ) : (
+      <p className={hovered ? "meme-text" : "no-text"}>{props.meme.name}</p>
+    );
   return (
     <div
       className="meme-item"
@@ -26,7 +34,7 @@ const MemeItem = props => {
         alt={props.meme.name}
         onClick={() => postMeme()}
       />
-      <p className={hovered ? "meme-text" : "no-text"}>{props.meme.name}</p>
+      {text_on_hover}
     </div>
   );
 };

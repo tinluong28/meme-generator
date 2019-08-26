@@ -12,11 +12,9 @@ const initialState = {
 };
 const MemeContext = React.createContext({ initialState });
 
-const MemeProvider = props => {
+const MemeProvider = ({ children }) => {
   return (
-    <MemeContext.Provider value={initialState}>
-      {props.children}
-    </MemeContext.Provider>
+    <MemeContext.Provider value={initialState}>{children}</MemeContext.Provider>
   );
 };
 
